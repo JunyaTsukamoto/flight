@@ -23,6 +23,15 @@ def get_flights():
     with open("flights.json", encoding="utf-8") as f:
         return json.load(f)
 
+@app.get("/", response_class=HTMLResponse)
+def index():
+    # 好きな方を使ってください
+    # return RedirectResponse(url="/docs")
+    return "<h1>Flight API</h1><p>See <a href='/docs'>/docs</a></p>"
+
 @app.get("/healthz")
 def healthz():
     return {"ok": True}
+
+
+
