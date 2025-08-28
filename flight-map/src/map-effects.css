@@ -1,0 +1,4 @@
+/* 選択中に地図タイルを暗く・白黒寄りに */
+.leaflet-layer.tiles-dimmed {
+    filter: grayscale(1) brightness(0.75) contrast(0.95);
+}
