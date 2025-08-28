@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import json
 
+from starlette.responses import HTMLResponse
+
 app = FastAPI()
 
 # CORS（Reactとの連携用）
