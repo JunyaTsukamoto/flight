@@ -1,9 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline, CircleMarker, Pane, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, CircleMarker, Pane, Tooltip, Marker } from "react-leaflet";
 import axios from "axios";
 import { endpoints } from "./api";
 import "leaflet/dist/leaflet.css";
 import "./map-effects.css";
+import L from "leaflet";
+
+const starIcon = new L.DivIcon({
+    html: `
+        <svg width="30" height="30" viewBox="0 0 24 24">
+            <path
+                d="M12 2 L15 9 H22 L17 14 L19 21 L12 17 L5 21 L7 14 L2 9 H9 Z"
+                fill="gold"
+                stroke="black"
+                stroke-width="1.5"
+            />
+        </svg>
+    `,
+    className: "star-icon",
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+});
+
+const IMPORTANT_AIRPORT_CODES = new Set([
+    "HND", // 羽田
+    "NRT", // 成田
+    "CTS", // 新千歳
+    "MMB", // 女満別
+    "OBO", // 帯広
+    "AXT", // 秋田
+    "TKG", // 但馬
+    "NGS", // 長崎
+    "KMJ", // 熊本
+    "KOJ", // 鹿児島
+    "ITM", // 伊丹
+    "NGO", // 中部
+    "KMI", // 宮崎
+    "TNE", // 種子島
+    "KUM", // 屋久島
+    "ISG" // 石垣
+]);
 
 const FlightMap = () => {
     const [airports, setAirports] = useState([]);
@@ -173,19 +209,53 @@ const FlightMap = () => {
             {/* --- 空港ポイント（最前面）--- */}
             {airports.map((airport, i) => {
                 const k = norm(airport["空港名"]);
-                const keepBright = selecting && connectedKeys.has(k); // 選択 or 接続先なら明るいまま
-                const dim = selecting && !keepBright;                 // それ以外は薄く
+                const keepBright = selecting && connectedKeys.has(k);
+                const dim = selecting && !keepBright;
 
+                // ⭐ 重要空港（コードで判定）
+                const isImportant = IMPORTANT_AIRPORT_CODES.has(airport["コード"]);
+
+                // ⭐ 重要空港 → 星マーカー
+                if (isImportant) {
+                    return (
+                        <Marker
+                            key={`star-${airport["コード"]}`}
+                            pane="points"
+                            position={[airport["緯度"], airport["経度"]]}
+                            icon={starIcon}
+                            eventHandlers={{
+                                click: () => {
+                                    const clicked = norm(airport["空港名"]);
+                                    setSelectedAirport(prev =>
+                                        prev && norm(prev) === clicked ? null : airport["空港名"]
+                                    );
+                                }
+                            }}
+                        >
+                            <Tooltip
+                                pane="airport-popups"
+                                direction="top"
+                                opacity={1}
+                                sticky
+                                className="airport-tooltip"
+                            >
+                                {airport["空港名"]}
+                            </Tooltip>
+                        </Marker>
+                    );
+                }
+
+                // 🔴 通常空港 → 赤丸
                 return (
                     <CircleMarker
-                        key={`cm-${airport["コード"] || airport["空港名"] || i}`}
+                        key={`cm-${airport["コード"]}`}
                         pane="points"
                         center={[airport["緯度"], airport["経度"]]}
-                        radius={dim ? 5 : 5}
+                        radius={5}
                         pathOptions={{
-                            color:       dim ? "#9aa4ad" : "#000000", // 枠線
-                            weight:      dim ? 1 : 1,
-                            fillColor:   dim ? "#ff8888" : "#ff0000", // 塗り：非接続は薄赤、接続は通常の赤
+                            color: dim ? "#9aa4ad" : "#000000",
+                            weight: 1,
+                            fillColor: dim ? "#ff8888" : "#ff0000",
                             fillOpacity: dim ? 0.25 : 1,
                         }}
                         eventHandlers={{
@@ -209,6 +279,7 @@ const FlightMap = () => {
                     </CircleMarker>
                 );
             })}
+
 
 
 

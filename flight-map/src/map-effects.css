@@ -2,3 +2,9 @@
 .leaflet-layer.tiles-dimmed {
     filter: grayscale(1) brightness(0.75) contrast(0.95);
 }
+
+.star-icon {
+    font-size: 26px;
+    color: gold;
+    text-shadow: 0 0 4px rgba(0,0,0,.8);
+}
