@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline, CircleMarker, Pane, Tooltip, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, CircleMarker, Pane, Tooltip, Marker, useMapEvent } from "react-leaflet";
 import axios from "axios";
 import { endpoints } from "./api";
 import "leaflet/dist/leaflet.css";
@@ -40,6 +40,24 @@ const IMPORTANT_AIRPORT_CODES = new Set([
     "KUM", // 屋久島
     "ISG" // 石垣
 ]);
+
+// 地図のどこかをクリックしたら選択解除するコンポーネント（修正版）
+const MapClickClearer = ({ clearSelection }) => {
+    useMapEvent("click", (e) => {
+        // クリックされた実際のDOM要素を取得
+        const target = e.originalEvent.target;
+
+        // その要素が「leaflet-interactive」（＝マーカーや線など）のクラスを持っているか確認
+        // SVG要素(CircleMarker)の場合、これで判定できます
+        const isInteractive = target.classList.contains("leaflet-interactive");
+
+        // インタラクティブな要素（マーカー等）以外の場所をクリックした時だけ解除を実行
+        if (!isInteractive) {
+            clearSelection();
+        }
+    });
+    return null;
+};
 
 const FlightMap = () => {
     const [airports, setAirports] = useState([]);
@@ -108,6 +126,9 @@ const FlightMap = () => {
 
     return (
         <MapContainer center={[44.5, 142]} zoom={6} style={{ height: "100%", width: "100%" }}>
+
+            <MapClickClearer clearSelection={() => setSelectedAirport(null)} />
+
             <TileLayer
                 // attribution='&copy; OSM'
                 // url="https://tile.openstreetmap.bzh/ca/{z}/{x}/{y}.png"
@@ -226,7 +247,9 @@ const FlightMap = () => {
                             position={[airport["緯度"], airport["経度"]]}
                             icon={starIcon}
                             eventHandlers={{
-                                click: () => {
+                                click: (e) => {
+                                    // 地図(Map)へのクリック伝播を止める
+                                    e.originalEvent?.stopPropagation();
                                     const clicked = norm(airport["空港名"]);
                                     setSelectedAirport(prev =>
                                         prev && norm(prev) === clicked ? null : airport["空港名"]
@@ -261,7 +284,9 @@ const FlightMap = () => {
                             fillOpacity: dim ? 0.25 : 1,
                         }}
                         eventHandlers={{
-                            click: () => {
+                            click: (e) => {
+                                // 地図(Map)へのクリック伝播を止める
+                                L.DomEvent.stopPropagation(e.originalEvent);
                                 const clicked = norm(airport["空港名"]);
                                 setSelectedAirport(prev =>
                                     prev && norm(prev) === clicked ? null : airport["空港名"]
