@@ -38,7 +38,8 @@ const IMPORTANT_AIRPORT_CODES = new Set([
     "KMI", // 宮崎
     "TNE", // 種子島
     "KUM", // 屋久島
-    "ISG" // 石垣
+    "ISG", // 石垣
+    "KUH" // 釧路
 ]);
 
 // 地図のどこかをクリックしたら選択解除するコンポーネント（修正版）
