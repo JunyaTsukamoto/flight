@@ -39,7 +39,8 @@ const IMPORTANT_AIRPORT_CODES = new Set([
     "TNE", // 種子島
     "KUM", // 屋久島
     "ISG", // 石垣
-    "KUH" // 釧路
+    "KUH", // 釧路
+    "OKA" // 那覇
 ]);
 
 // 地図のどこかをクリックしたら選択解除するコンポーネント（修正版）
