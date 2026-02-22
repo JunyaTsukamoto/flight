@@ -40,7 +40,9 @@ const IMPORTANT_AIRPORT_CODES = new Set([
     "KUM", // 屋久島
     "ISG", // 石垣
     "KUH", // 釧路
-    "OKA" // 那覇
+    "OKA", // 那覇
+    "TKS", // 徳島
+    "TAK" // 高松
 ]);
 
 // 地図のどこかをクリックしたら選択解除するコンポーネント（修正版）
